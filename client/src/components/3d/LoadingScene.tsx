@@ -107,6 +107,7 @@ const WeatherScene3D = () => {
     <Canvas
       camera={{ position: [0, 0, 6], fov: 50 }}
       style={{ background: "transparent" }}
+      gl={{ powerPreference: "default", preserveDrawingBuffer: false }}
     >
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} intensity={1} color="#FF8C00" />
