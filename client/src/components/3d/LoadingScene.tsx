@@ -1,4 +1,4 @@
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
   Float,
@@ -54,22 +54,22 @@ const Sun = () => {
 };
 
 const Clouds = () => {
-  return (
-    <>
-      {baseCloudsData.map((cloud, i) => (
-        <Float key={i} speed={cloud.speed} floatIntensity={0.5}>
-          <Sphere args={[cloud.scale, 16, 16]} position={cloud.position}>
-            <meshStandardMaterial
-              color="#ffffff"
-              transparent
-              opacity={0.7}
-              roughness={1}
-            />
-          </Sphere>
-        </Float>
-      ))}
-    </>
-  );
+  // Memoize clouds so geometries/materials aren't recreated each render
+  const cloudSpheres = useMemo(() => {
+    return baseCloudsData.map((cloud, i) => (
+      <Float key={i} speed={cloud.speed} floatIntensity={0.5}>
+        <Sphere args={[cloud.scale, 16, 16]} position={cloud.position}>
+          <meshStandardMaterial
+            color="#ffffff"
+            transparent
+            opacity={0.7}
+            roughness={1}
+          />
+        </Sphere>
+      </Float>
+    ));
+  }, []);
+  return <>{cloudSpheres}</>;
 };
 
 const RainDrops = () => {
@@ -82,11 +82,9 @@ const RainDrops = () => {
     if (dropsRef.current) {
       const positions = dropsRef.current.geometry.attributes.position
         .array as Float32Array;
-      for (let i = 0; i < 300; i++) {
+      for (let i = 0; i < 200; i++) {
         positions[i * 3 + 1] -= 0.1;
-        if (positions[i * 3 + 1] < -5) {
-          positions[i * 3 + 1] = 5;
-        }
+        if (positions[i * 3 + 1] < -5) positions[i * 3 + 1] = 5;
       }
       dropsRef.current.geometry.attributes.position.needsUpdate = true;
     }
@@ -103,6 +101,25 @@ const RainDrops = () => {
 };
 
 const WeatherScene3D = () => {
+  // Optional: listen for WebGL context lost/restored
+  useEffect(() => {
+    const canvas = document.querySelector("canvas");
+    if (!canvas) return;
+
+    const onLost = (e: Event) => {
+      e.preventDefault();
+      console.warn("WebGL context lost");
+    };
+    const onRestored = () => console.log("WebGL context restored");
+
+    canvas.addEventListener("webglcontextlost", onLost);
+    canvas.addEventListener("webglcontextrestored", onRestored);
+
+    return () => {
+      canvas.removeEventListener("webglcontextlost", onLost);
+      canvas.removeEventListener("webglcontextrestored", onRestored);
+    };
+  }, []);
   return (
     <Canvas
       camera={{ position: [0, 0, 6], fov: 50 }}
