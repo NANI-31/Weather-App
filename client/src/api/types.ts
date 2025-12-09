@@ -129,3 +129,11 @@ export interface GeocodingAPIResponse {
   country: string;
   state?: string;
 }
+
+export interface OpenMeteoSearchResult {
+  name: string;
+  latitude: number;
+  longitude: number;
+  country: string;
+  admin1?: string;
+}

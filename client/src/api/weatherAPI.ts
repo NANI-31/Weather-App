@@ -6,6 +6,7 @@ import type {
   CitySearchResult,
   ForecastResponse,
   GeocodingAPIResponse,
+  OpenMeteoSearchResult,
 } from "./types.ts";
 
 export interface WeatherBundle {
@@ -107,7 +108,7 @@ export async function searchCities(query: string): Promise<CitySearchResult[]> {
 
     if (!data.results) return [];
 
-    return data.results.map((c: any) => ({
+    return data.results.map((c: OpenMeteoSearchResult) => ({
       name: c.name,
       lat: c.latitude,
       lon: c.longitude,
@@ -120,7 +121,7 @@ export async function searchCities(query: string): Promise<CitySearchResult[]> {
     const { data } = await axios.get(`${GEO_URL}/direct`, {
       params: { q: query, limit: 5, appid: API_KEY },
     });
-    return (data ?? []).map((c: any) => ({
+    return (data ?? []).map((c: GeocodingAPIResponse) => ({
       name: c.name,
       lat: c.lat,
       lon: c.lon,
