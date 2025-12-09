@@ -24,6 +24,12 @@ const GEO_URL = import.meta.env.VITE_GEO_URL;
 const api = axios.create({
   baseURL: BASE_URL,
 });
+
+if (!API_KEY) {
+  console.warn(
+    "VITE_WEATHER_API_KEY is missing! Weather requests will likely fail."
+  );
+}
 // --- Helpers ---
 const toHourly = (forecastData: ForecastResponse): ForecastItem[] => {
   const list = forecastData.list ?? [];

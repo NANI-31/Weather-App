@@ -33,11 +33,13 @@ export const useWeather = () => {
         const bundle = await apiGetWeatherByCoords(lat, lon);
         dispatch(setWeatherBundle(bundle));
       } catch (err: unknown) {
-        dispatch(
-          setError(
-            err instanceof Error ? err.message : "Failed to fetch weather data"
-          )
-        );
+        let msg = "Failed to fetch weather data";
+        if (axios.isAxiosError(err)) {
+          msg = err.response?.data?.message || err.message;
+        } else if (err instanceof Error) {
+          msg = err.message;
+        }
+        dispatch(setError(msg));
       } finally {
         dispatch(setLoading(false));
       }
@@ -52,11 +54,13 @@ export const useWeather = () => {
         const bundle = await apiGetWeatherByCity(city);
         dispatch(setWeatherBundle(bundle));
       } catch (err: unknown) {
-        dispatch(
-          setError(
-            err instanceof Error ? err.message : "Failed to fetch weather data"
-          )
-        );
+        let msg = "Failed to fetch weather data";
+        if (axios.isAxiosError(err)) {
+          msg = err.response?.data?.message || err.message;
+        } else if (err instanceof Error) {
+          msg = err.message;
+        }
+        dispatch(setError(msg));
       } finally {
         dispatch(setLoading(false));
       }
@@ -84,11 +88,13 @@ export const useWeather = () => {
         const bundle = await apiGetWeatherByCoords(city.lat, city.lon);
         dispatch(setWeatherBundle(bundle));
       } catch (err: unknown) {
-        dispatch(
-          setError(
-            err instanceof Error ? err.message : "Failed to fetch weather data"
-          )
-        );
+        let msg = "Failed to fetch weather data";
+        if (axios.isAxiosError(err)) {
+          msg = err.response?.data?.message || err.message;
+        } else if (err instanceof Error) {
+          msg = err.message;
+        }
+        dispatch(setError(msg));
       } finally {
         dispatch(clearSearchResults());
         dispatch(setLoading(false));
