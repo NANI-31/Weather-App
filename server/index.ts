@@ -19,7 +19,10 @@ import cookieParser from "cookie-parser";
 // Middleware
 app.use(
   cors({
-    origin: true, // Allow any origin (reflects request origin)
+    origin: [
+      "http://localhost:5173",
+      "https://weather-app-nine-lilac-90.vercel.app",
+    ],
     credentials: true,
   })
 );
