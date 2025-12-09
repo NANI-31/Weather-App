@@ -113,7 +113,7 @@ export const useWeather = () => {
         if (settings.isLoggedIn) {
           try {
             await axios.post(
-              "http://localhost:5000/api/users/remove-favorite",
+              "https://weather-app-server-3dt5.onrender.com/api/users/remove-favorite",
               { city },
               { withCredentials: true }
             );
@@ -128,7 +128,7 @@ export const useWeather = () => {
         if (settings.isLoggedIn) {
           try {
             await axios.post(
-              "http://localhost:5000/api/users/add-favorite",
+              "https://weather-app-server-3dt5.onrender.com/api/users/add-favorite",
               { city },
               { withCredentials: true }
             );
