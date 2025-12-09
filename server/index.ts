@@ -6,6 +6,7 @@ import cors from "cors";
 import connectDB from "./config/db";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
+import weatherRoutes from "./routes/weatherRoutes";
 
 const app: Application = express();
 const PORT = process.env.PORT || 5000;
@@ -28,6 +29,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/weather", weatherRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("API is running...");

@@ -17,19 +17,16 @@ export interface WeatherBundle {
   uvIndex: number | null; // keep null or a fallback value
 }
 
-const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-const GEO_URL = import.meta.env.VITE_GEO_URL;
+// NOTE: We now use our backend proxy.
+// Base URL from environment should point to our server (e.g. http://localhost:5000/api)
+// or relative if served from same origin.
+const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:5000";
 
 const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: `${BASE_URL}/api`,
+  withCredentials: true, // important if you want cookies later, but fine here
 });
 
-if (!API_KEY) {
-  console.warn(
-    "VITE_WEATHER_API_KEY is missing! Weather requests will likely fail."
-  );
-}
 // --- Helpers ---
 const toHourly = (forecastData: ForecastResponse): ForecastItem[] => {
   const list = forecastData.list ?? [];
@@ -91,8 +88,9 @@ const toDaily = (forecastData: ForecastResponse): ForecastItem[] => {
 export async function geocodeCity(
   city: string
 ): Promise<{ lat: number; lon: number }> {
-  const { data } = await api.get(`${GEO_URL}/direct`, {
-    params: { q: city, limit: 1, appid: API_KEY },
+  // Use our backend proxy for direct geocoding
+  const { data } = await api.get(`/weather/geo/direct`, {
+    params: { q: city, limit: 1 },
   });
   if (!Array.isArray(data) || data.length === 0) {
     throw new Error("City not found");
@@ -104,7 +102,8 @@ export async function searchCities(query: string): Promise<CitySearchResult[]> {
   if (!query || query.trim().length < 2) return [];
 
   try {
-    // Use Open-Meteo for better autocomplete/fuzzy matching
+    // Keep using Open-Meteo as it is free and doesn't require key, OR proxy it too if desired.
+    // For now, Open-Meteo is public/free, so client-side call is fine and faster.
     const { data } = await axios.get(
       `https://geocoding-api.open-meteo.com/v1/search`,
       {
@@ -122,10 +121,13 @@ export async function searchCities(query: string): Promise<CitySearchResult[]> {
       state: c.admin1,
     }));
   } catch (error) {
-    console.warn("Open-Meteo search failed, falling back to OWM", error);
-    // Fallback to strict OWM search if Open-Meteo fails
-    const { data } = await axios.get(`${GEO_URL}/direct`, {
-      params: { q: query, limit: 5, appid: API_KEY },
+    console.warn(
+      "Open-Meteo search failed, falling back to OWM via Proxy",
+      error
+    );
+    // Fallback to our proxy for OWM
+    const { data } = await api.get(`/weather/geo/direct`, {
+      params: { q: query, limit: 5 },
     });
     return (data ?? []).map((c: GeocodingAPIResponse) => ({
       name: c.name,
@@ -141,19 +143,17 @@ export async function getWeatherByCoords(
   lat: number,
   lon: number
 ): Promise<WeatherBundle> {
+  // Calls go to /api/weather/...
   const [weatherRes, forecastRes, airRes] = await Promise.all([
-    api.get("/weather", {
-      params: { lat, lon, appid: API_KEY, units: "metric" },
+    api.get("/weather/current", {
+      params: { lat, lon, units: "metric" },
     }),
-    api.get("/forecast", {
-      params: { lat, lon, appid: API_KEY, units: "metric" },
+    api.get("/weather/forecast", {
+      params: { lat, lon, units: "metric" },
     }),
-    api.get("/air_pollution", {
-      params: { lat, lon, appid: API_KEY },
+    api.get("/weather/air_pollution", {
+      params: { lat, lon },
     }),
-    // api.get("/uvi", {
-    //   params: { lat, lon, appid: API_KEY },
-    // }),
   ]);
 
   // Validate responses
@@ -169,7 +169,7 @@ export async function getWeatherByCoords(
   const weatherData = weatherRes.data;
   const forecastData = forecastRes.data;
   const airData = airRes.data;
-  // const uvData = uvRes.data;
+
   const currentWeather: WeatherData = {
     city: weatherData.name,
     country: weatherData.sys.country,
@@ -206,7 +206,6 @@ export async function getWeatherByCoords(
     pm10: airData.list?.[0]?.components?.pm10 ?? 0,
   };
 
-  // Free tier: OneCall UV may not be available; keep null or compute later if you add OneCall
   const uvIndex: number | null = 5;
 
   return {
@@ -224,8 +223,8 @@ export async function getWeatherByCity(city: string): Promise<WeatherBundle> {
 }
 
 export async function getCurrentWeather(city: string): Promise<WeatherData> {
-  const { data } = await api.get("/weather", {
-    params: { q: city, appid: API_KEY, units: "metric" },
+  const { data } = await api.get("/weather/current", {
+    params: { q: city, units: "metric" },
   });
 
   if (data.cod && data.cod !== 200 && data.cod !== "200") {
