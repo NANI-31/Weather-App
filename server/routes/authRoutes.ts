@@ -4,6 +4,8 @@ import {
   loginUser,
   googleLogin,
   logoutUser,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/authController";
 import upload from "../middleware/upload";
 
@@ -13,5 +15,7 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/google", googleLogin);
 router.post("/logout", logoutUser);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
 export default router;

@@ -9,6 +9,8 @@ export interface IUser extends Document {
   name?: string;
   createdAt: Date;
   favorites: string[];
+  resetPasswordOtp?: string;
+  resetPasswordExpires?: Date;
 }
 
 const userSchema: Schema = new Schema({
@@ -51,6 +53,12 @@ const userSchema: Schema = new Schema({
       trim: true,
     },
   ],
+  resetPasswordOtp: {
+    type: String,
+  },
+  resetPasswordExpires: {
+    type: Date,
+  },
 });
 
 const User = mongoose.model<IUser>("User", userSchema);

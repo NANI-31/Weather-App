@@ -5,6 +5,7 @@ import { OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
 
 import bcrypt from "bcryptjs";
+import nodemailer from "nodemailer";
 
 const generateToken = (res: Response, userId: string) => {
   if (!process.env.JWT_SECRET) {
@@ -199,4 +200,98 @@ const logoutUser = (req: Request, res: Response) => {
   res.status(200).json({ message: "Logged out successfully" });
 };
 
-export { registerUser, loginUser, googleLogin, logoutUser };
+// @desc    Forgot Password - Send OTP
+// @route   POST /api/auth/forgot-password
+// @access  Public
+const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    // Generate 6 digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+
+    user.resetPasswordOtp = otp;
+    user.resetPasswordExpires = expiry;
+    await user.save();
+
+    // Send Email
+    const transporter = nodemailer.createTransport({
+      service: "gmail", // Or use host/port from env
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Password Reset OTP - WeatherPro",
+      text: `Your OTP for password reset is: ${otp}\n\nThis OTP is valid for 10 minutes.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: "OTP sent to email" });
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+    res
+      .status(500)
+      .json({ message: "Failed to send OTP", error: (error as Error).message });
+  }
+};
+
+// @desc    Reset Password - Verify OTP and Update
+// @route   POST /api/auth/reset-password
+// @access  Public
+const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    const user = await User.findOne({
+      email,
+      resetPasswordOtp: otp,
+      resetPasswordExpires: { $gt: Date.now() }, // Check expiry
+    });
+
+    if (!user) {
+      res.status(400).json({ message: "Invalid or expired OTP" });
+      return;
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    user.resetPasswordOtp = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error("Reset Password Error:", error);
+    res
+      .status(500)
+      .json({
+        message: "Failed to reset password",
+        error: (error as Error).message,
+      });
+  }
+};
+
+export {
+  registerUser,
+  loginUser,
+  googleLogin,
+  logoutUser,
+  forgotPassword,
+  resetPassword,
+};
