@@ -6,6 +6,7 @@ export interface AuthRequest extends Request {
   user?: {
     id: string;
   };
+  cookies: { [key: string]: string };
 }
 
 const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
