@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { useWeather } from "@hooks/useWeather";
 import { Heart, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,7 +6,7 @@ import { getCurrentWeather } from "@api/weatherAPI";
 import WeatherIcon from "./WeatherIcon";
 import type { WeatherData } from "@api/types";
 
-const FavoriteCityCard = ({
+const FavoriteCityCardComponent = ({
   city,
   onRemove,
   onSelect,
@@ -88,6 +88,8 @@ const FavoriteCityCard = ({
     </motion.div>
   );
 };
+
+const FavoriteCityCard = memo(FavoriteCityCardComponent);
 
 export const FavoriteCities = () => {
   const { favoriteCities, toggleFavorite, fetchWeather } = useWeather();

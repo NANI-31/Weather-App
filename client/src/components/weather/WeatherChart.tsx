@@ -42,8 +42,6 @@ export const WeatherChart = ({ type = "temperature" }: WeatherChartProps) => {
     });
   }, [hourlyForecast, convertTemp]);
 
-  if (!hourlyForecast.length) return null;
-
   const labels = useMemo(
     () =>
       hourlyForecast.map((item) =>
@@ -162,6 +160,8 @@ export const WeatherChart = ({ type = "temperature" }: WeatherChartProps) => {
     }),
     [colors, isDark]
   );
+
+  if (!hourlyForecast.length) return null;
 
   return (
     <motion.div

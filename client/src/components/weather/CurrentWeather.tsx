@@ -14,6 +14,16 @@ import {
 import { cn } from "@lib/utils";
 import { motion } from "framer-motion";
 
+const formatTime = (timestamp: number, timezone: number) => {
+  const date = new Date((timestamp + timezone) * 1000);
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "UTC",
+  });
+};
+
 export const CurrentWeather = () => {
   const {
     currentWeather,
@@ -28,16 +38,6 @@ export const CurrentWeather = () => {
   if (!currentWeather) return null;
 
   const isFavorite = favoriteCities.includes(currentWeather.city);
-
-  const formatTime = (timestamp: number, timezone: number) => {
-    const date = new Date((timestamp + timezone) * 1000);
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-      timeZone: "UTC",
-    });
-  };
 
   return (
     <motion.div
