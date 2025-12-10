@@ -280,7 +280,7 @@ export default function AuthForms() {
                 className="text-xs text-muted-foreground hover:text-primary transition-colors"
               >
                 Forgot Password?
-              </button>>
+              </button>
             </div>
             <button
               type="submit"
@@ -415,7 +415,7 @@ export default function AuthForms() {
             </div>
             {/* Same height spacer as password field to maintain layout */}
             <div className="h-[60px] w-full hidden"></div>
-            
+
             <div className="flex justify-between items-center pt-2">
               <button
                 type="button"
@@ -455,8 +455,8 @@ export default function AuthForms() {
                   md:text-sm rounded-xl transition-all"
               />
             </div>
-             {/* Same height spacer */}
-             <div className="h-[60px] w-full hidden"></div>
+            {/* Same height spacer */}
+            <div className="h-[60px] w-full hidden"></div>
 
             <div className="flex justify-between items-center pt-2">
               <button
