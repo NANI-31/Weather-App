@@ -44,112 +44,124 @@ export const WeatherChart = ({ type = "temperature" }: WeatherChartProps) => {
 
   if (!hourlyForecast.length) return null;
 
-  const labels = hourlyForecast.map((item) =>
-    new Date(item.dt * 1000).toLocaleTimeString("en-US", {
-      hour: "numeric",
-      hour12: true,
-    })
+  const labels = useMemo(
+    () =>
+      hourlyForecast.map((item) =>
+        new Date(item.dt * 1000).toLocaleTimeString("en-US", {
+          hour: "numeric",
+          hour12: true,
+        })
+      ),
+    [hourlyForecast]
   );
 
   const isDark = settings.themeMode === "dark";
 
-  const getChartColors = () => {
-    return {
+  const colors = useMemo(
+    () => ({
       primary: "rgb(255, 140, 0)",
       primaryAlpha: "rgba(255, 140, 0, 0.2)",
       secondary: "rgb(255, 215, 0)",
       secondaryAlpha: "rgba(255, 215, 0, 0.2)",
       text: isDark ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.7)",
       grid: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
-    };
-  };
+    }),
+    [isDark]
+  );
 
-  const colors = getChartColors();
+  const temperatureData = useMemo(
+    () => ({
+      labels,
+      datasets: [
+        {
+          label: `Temperature (${tempUnit})`,
+          data: hourlyForecast.map((item) => convertTemp(item.temp)),
+          borderColor: colors.primary,
+          backgroundColor: colors.primaryAlpha,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: colors.primary,
+        },
+        {
+          label: "Feels Like",
+          data: feelsLikeData,
+          borderColor: colors.secondary,
+          backgroundColor: "transparent",
+          borderDash: [5, 5],
+          tension: 0.4,
+          pointRadius: 0,
+        },
+      ],
+    }),
+    [labels, hourlyForecast, convertTemp, tempUnit, colors, feelsLikeData]
+  );
 
-  const temperatureData = {
-    labels,
-    datasets: [
-      {
-        label: `Temperature (${tempUnit})`,
-        data: hourlyForecast.map((item) => convertTemp(item.temp)),
-        borderColor: colors.primary,
-        backgroundColor: colors.primaryAlpha,
-        fill: true,
-        tension: 0.4,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-        pointBackgroundColor: colors.primary,
-      },
-      {
-        label: "Feels Like",
-        data: feelsLikeData,
-        borderColor: colors.secondary,
-        backgroundColor: "transparent",
-        borderDash: [5, 5],
-        tension: 0.4,
-        pointRadius: 0,
-      },
-    ],
-  };
+  const precipitationData = useMemo(
+    () => ({
+      labels,
+      datasets: [
+        {
+          label: "Precipitation Chance (%)",
+          data: hourlyForecast.map((item) => Math.round(item.pop * 100)),
+          backgroundColor: "rgba(75, 156, 211, 0.6)",
+          borderColor: "rgb(75, 156, 211)",
+          borderWidth: 2,
+          borderRadius: 8,
+        },
+      ],
+    }),
+    [labels, hourlyForecast]
+  );
 
-  const precipitationData = {
-    labels,
-    datasets: [
-      {
-        label: "Precipitation Chance (%)",
-        data: hourlyForecast.map((item) => Math.round(item.pop * 100)),
-        backgroundColor: "rgba(75, 156, 211, 0.6)",
-        borderColor: "rgb(75, 156, 211)",
-        borderWidth: 2,
-        borderRadius: 8,
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: true,
-        position: "top" as const,
-        labels: {
-          color: colors.text,
-          usePointStyle: true,
-          padding: 20,
+  const options = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: "top" as const,
+          labels: {
+            color: colors.text,
+            usePointStyle: true,
+            padding: 20,
+          },
+        },
+        tooltip: {
+          backgroundColor: isDark
+            ? "rgba(0, 0, 0, 0.8)"
+            : "rgba(255, 255, 255, 0.9)",
+          titleColor: isDark ? "#fff" : "#000",
+          bodyColor: isDark ? "#fff" : "#000",
+          borderColor: colors.primary,
+          borderWidth: 1,
+          cornerRadius: 12,
+          padding: 12,
         },
       },
-      tooltip: {
-        backgroundColor: isDark
-          ? "rgba(0, 0, 0, 0.8)"
-          : "rgba(255, 255, 255, 0.9)",
-        titleColor: isDark ? "#fff" : "#000",
-        bodyColor: isDark ? "#fff" : "#000",
-        borderColor: colors.primary,
-        borderWidth: 1,
-        cornerRadius: 12,
-        padding: 12,
-      },
-    },
-    scales: {
-      x: {
-        grid: {
-          color: colors.grid,
+      scales: {
+        x: {
+          grid: {
+            color: colors.grid,
+          },
+          ticks: {
+            color: colors.text,
+          },
         },
-        ticks: {
-          color: colors.text,
+        y: {
+          grid: {
+            color: colors.grid,
+          },
+          ticks: {
+            color: colors.text,
+          },
         },
       },
-      y: {
-        grid: {
-          color: colors.grid,
-        },
-        ticks: {
-          color: colors.text,
-        },
-      },
-    },
-  };
+    }),
+    [colors, isDark]
+  );
 
   return (
     <motion.div

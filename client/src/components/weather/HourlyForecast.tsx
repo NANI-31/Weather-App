@@ -2,20 +2,22 @@ import { useWeather } from "@hooks/useWeather";
 // import WeatherIcon from "./WeatherIcon";
 import { motion } from "framer-motion";
 
+const formatHour = (timestamp: number) => {
+  return new Date(timestamp * 1000).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    hour12: true,
+  });
+};
+
+const getWeatherIcon = (icon: string) => {
+  return `https://openweathermap.org/img/wn/${icon}@2x.png`;
+};
+
 export const HourlyForecast = () => {
   const { hourlyForecast, convertTemp, tempUnit } = useWeather();
 
   if (!hourlyForecast.length) return null;
 
-  const formatHour = (timestamp: number) => {
-    return new Date(timestamp * 1000).toLocaleTimeString("en-US", {
-      hour: "numeric",
-      hour12: true,
-    });
-  };
-  const getWeatherIcon = (icon: string) => {
-    return `https://openweathermap.org/img/wn/${icon}@2x.png`;
-  };
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

@@ -2,25 +2,25 @@ import { useWeather } from "@hooks/useWeather";
 import WeatherIcon from "./WeatherIcon";
 import { motion } from "framer-motion";
 
+const formatDay = (timestamp: number, index: number) => {
+  if (index === 0) return "Today";
+  if (index === 1) return "Tomorrow";
+  return new Date(timestamp * 1000).toLocaleDateString("en-US", {
+    weekday: "short",
+  });
+};
+
+const formatDate = (timestamp: number) => {
+  return new Date(timestamp * 1000).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+};
+
 export const DailyForecast = () => {
   const { dailyForecast, convertTemp } = useWeather();
 
   if (!dailyForecast.length) return null;
-
-  const formatDay = (timestamp: number, index: number) => {
-    if (index === 0) return "Today";
-    if (index === 1) return "Tomorrow";
-    return new Date(timestamp * 1000).toLocaleDateString("en-US", {
-      weekday: "short",
-    });
-  };
-
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp * 1000).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
-  };
 
   return (
     <motion.div
