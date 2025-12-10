@@ -5,7 +5,9 @@ import axios from "axios";
 // Use relative path for proxy to handle (works on mobile/network)
 const BASE_URL =
   import.meta.env.VITE_BASE_URL ||
-  "https://weather-app-server-3dt5.onrender.com";
+  (import.meta.env.DEV
+    ? "http://localhost:5000"
+    : "https://weather-app-server-3dt5.onrender.com");
 const API_BASE_URL = `${BASE_URL}/api`;
 
 const authApi = axios.create({
