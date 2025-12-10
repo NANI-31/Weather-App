@@ -28,7 +28,7 @@ const App = () => {
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <Provider store={store}>
         <BrowserRouter>
-          <Suspense fallback={<LoadingScreen progress={50} />}>
+          <Suspense fallback={<LoadingScreen progress={0} />}>
             <Routes>
               <Route element={<Layout />}>
                 <Route path="/" element={<Index />} />
