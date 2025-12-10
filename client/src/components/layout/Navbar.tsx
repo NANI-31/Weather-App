@@ -14,11 +14,9 @@ export const Navbar = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (isOpen) {
-      const timer = setTimeout(() => setIsOpen(false), 0);
-      return () => clearTimeout(timer);
-    }
-  }, [location.pathname, isOpen]);
+    const timer = setTimeout(() => setIsOpen(false), 0);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
   return (
     <>
