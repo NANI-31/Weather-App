@@ -22,6 +22,7 @@ export const Layout = ({ children }: LayoutProps) => {
   const [showLoading, setShowLoading] = useState(!currentWeather);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isMinLoadTimePassed, setIsMinLoadTimePassed] = useState(false);
+  const [hasAskedLocation, setHasAskedLocation] = useState(false);
 
   const currentWeatherTheme = useSelector(
     (state: RootState) => state.weather.weatherTheme
@@ -59,21 +60,9 @@ export const Layout = ({ children }: LayoutProps) => {
 
   // Weather Fetching & Loading Logic
   useEffect(() => {
-    // Only fetch if we don't have data
-    if (currentWeather) return;
-
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          fetchWeather(position.coords.latitude, position.coords.longitude);
-        },
-        () => {
-          fetchWeather(40.7128, -74.006);
-          // toast.info("Using default location.");
-        }
-      );
-    } else {
-      fetchWeather(40.7128, -74.006);
+    // 1. If we don't have data, fetch default immediately to unblock loading screen
+    if (!currentWeather) {
+      fetchWeather(40.7128, -74.006); // Default: New York
     }
   }, [fetchWeather, currentWeather]);
 
@@ -121,6 +110,24 @@ export const Layout = ({ children }: LayoutProps) => {
       return () => clearTimeout(timer);
     }
   }, [currentWeather, loading, isMinLoadTimePassed]);
+
+  // Delayed Geolocation Prompt
+  useEffect(() => {
+    if (!showLoading && !hasAskedLocation) {
+      setHasAskedLocation(true);
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            fetchWeather(position.coords.latitude, position.coords.longitude);
+          },
+          (error) => {
+            // User denied or error - stay on default location
+            console.log("Location access denied/error:", error);
+          }
+        );
+      }
+    }
+  }, [showLoading, hasAskedLocation, fetchWeather]);
 
   return (
     <div className="h-screen w-full overflow-hidden bg-background text-foreground transition-colors duration-500 relative flex flex-col">
