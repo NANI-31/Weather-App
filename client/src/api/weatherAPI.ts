@@ -100,7 +100,10 @@ export async function geocodeCity(
   return { lat: data[0].lat, lon: data[0].lon };
 }
 
-export async function searchCities(query: string): Promise<CitySearchResult[]> {
+export async function searchCities(
+  query: string,
+  signal?: AbortSignal
+): Promise<CitySearchResult[]> {
   if (!query || query.trim().length < 2) return [];
 
   try {
@@ -110,6 +113,7 @@ export async function searchCities(query: string): Promise<CitySearchResult[]> {
       `https://geocoding-api.open-meteo.com/v1/search`,
       {
         params: { name: query, count: 5, language: "en", format: "json" },
+        signal,
       }
     );
 
@@ -130,6 +134,7 @@ export async function searchCities(query: string): Promise<CitySearchResult[]> {
     // Fallback to our proxy for OWM
     const { data } = await api.get(`/weather/geo/direct`, {
       params: { q: query, limit: 5 },
+      signal,
     });
     return (data ?? []).map((c: GeocodingAPIResponse) => ({
       name: c.name,

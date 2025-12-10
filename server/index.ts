@@ -29,6 +29,8 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+import { errorHandler } from "./middleware/errorMiddleware";
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -37,6 +39,9 @@ app.use("/api/weather", weatherRoutes);
 app.get("/", (req: Request, res: Response) => {
   res.send("API is running...");
 });
+
+// Error Middleware (must be last)
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

@@ -68,13 +68,34 @@ export const useWeather = () => {
     [dispatch]
   );
 
+  // Search with cancellation
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   const search = useCallback(
     async (query: string) => {
+      if (!query) {
+        dispatch(clearSearchResults());
+        return;
+      }
+
+      // Cancel previous request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
+
       try {
-        const results = await apiSearchCities(query);
+        const results = await apiSearchCities(
+          query,
+          abortControllerRef.current.signal
+        );
         dispatch(setSearchResults(results));
-      } catch {
-        // keep silent; searching isn't critical
+      } catch (err: unknown) {
+        if (axios.isCancel(err)) {
+          // Ignore cancellation
+          return;
+        }
+        // console.error(err); // optional logging
         dispatch(setSearchResults([]));
       }
     },
