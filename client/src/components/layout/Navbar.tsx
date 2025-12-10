@@ -14,8 +14,8 @@ export const Navbar = () => {
   const location = useLocation();
 
   useEffect(() => {
-    setIsOpen(false);
-  }, [location.pathname]);
+    if (isOpen) setIsOpen(false);
+  }, [location.pathname, isOpen]);
 
   return (
     <>
