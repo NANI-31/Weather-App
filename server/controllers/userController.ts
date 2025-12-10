@@ -184,24 +184,35 @@ export const deleteAllFavorites = async (req: AuthRequest, res: Response) => {
 };
 
 export const deleteAccount = async (req: AuthRequest, res: Response) => {
+  console.log("deleteAccount controller hit");
   const userId = req.user?.id;
+  console.log("deleteAccount userId:", userId);
 
   try {
     const user = await User.findById(userId);
+    console.log("User found:", user ? user.email : "No user found");
 
     if (user) {
       // 1. Delete Cloudinary Image
       if (user.picture && user.picture.includes("cloudinary")) {
+        console.log(
+          "Attempting to delete Cloudinary image for user:",
+          user.email
+        );
         const parts = user.picture.split("/");
         const fileName = parts[parts.length - 1];
         const publicId = fileName.split(".")[0];
+        console.log("Cloudinary Public ID:", publicId);
 
         // If your images are in 'weatherApp' folder, you might need 'weatherApp/publicId'
         // But earlier we saw `folder: "weatherApp"`. Cloudinary usually needs 'folder/id' for destroy.
         // Let's protect against errors here.
         if (publicId) {
           try {
-            await cloudinary.uploader.destroy(`weatherApp/${publicId}`);
+            const result = await cloudinary.uploader.destroy(
+              `weatherApp/${publicId}`
+            );
+            console.log("Cloudinary destroy result:", result);
           } catch (err) {
             console.error("Failed to delete cloudinary image", err);
           }
@@ -209,7 +220,9 @@ export const deleteAccount = async (req: AuthRequest, res: Response) => {
       }
 
       // 2. Delete User
+      console.log("Deleting user from DB...");
       await User.findByIdAndDelete(userId);
+      console.log("User deleted from DB");
 
       // Clear cookie
       res.cookie("token", "", {

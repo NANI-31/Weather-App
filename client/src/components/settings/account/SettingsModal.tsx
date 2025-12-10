@@ -89,7 +89,8 @@ export default function SettingsModal({
       dispatch(clearFavoriteCities());
       toast.info("Account deleted. We're sad to see you go.");
       onClose(); // Though usually unmounted by logout
-    } catch {
+    } catch (error) {
+      console.error("Delete Account Frontend Error:", error);
       toast.error("Failed to delete account");
     }
   };
