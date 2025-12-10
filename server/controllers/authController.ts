@@ -242,6 +242,11 @@ const forgotPassword = async (req: Request, res: Response): Promise<void> => {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+      logger: true, // Log to console
+      debug: true, // Include SMTP traffic in logs
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 10000, // 10 seconds
+      socketTimeout: 10000, // 10 seconds
     });
 
     const mailOptions = {
