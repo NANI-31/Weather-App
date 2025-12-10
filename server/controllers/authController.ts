@@ -244,7 +244,13 @@ const forgotPassword = async (req: Request, res: Response): Promise<void> => {
       },
       logger: true,
       debug: true,
-      connectionTimeout: 10000,
+      // Increase timeouts to handle slow cloud network
+      connectionTimeout: 60000,
+      greetingTimeout: 30000,
+      socketTimeout: 60000,
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
 
     const mailOptions = {
