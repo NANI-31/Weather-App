@@ -261,6 +261,13 @@
     height: 7px;
   }
 
+  @media (max-width: 768px) {
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px; /* Thinner for mobile */
+      height: 4px;
+    }
+  }
+
   .custom-scrollbar::-webkit-scrollbar-track {
     /* background: transparent; */
   }
