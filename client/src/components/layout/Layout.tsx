@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { type RootState } from "@app/store";
@@ -22,7 +22,7 @@ export const Layout = ({ children }: LayoutProps) => {
   const [showLoading, setShowLoading] = useState(!currentWeather);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isMinLoadTimePassed, setIsMinLoadTimePassed] = useState(false);
-  const [hasAskedLocation, setHasAskedLocation] = useState(false);
+  const hasAskedLocationRef = useRef(false);
 
   const currentWeatherTheme = useSelector(
     (state: RootState) => state.weather.weatherTheme
@@ -112,9 +112,10 @@ export const Layout = ({ children }: LayoutProps) => {
   }, [currentWeather, loading, isMinLoadTimePassed]);
 
   // Delayed Geolocation Prompt
+  // Delayed Geolocation Prompt
   useEffect(() => {
-    if (!showLoading && !hasAskedLocation) {
-      setHasAskedLocation(true);
+    if (!showLoading && !hasAskedLocationRef.current) {
+      hasAskedLocationRef.current = true;
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
@@ -127,7 +128,7 @@ export const Layout = ({ children }: LayoutProps) => {
         );
       }
     }
-  }, [showLoading, hasAskedLocation, fetchWeather]);
+  }, [showLoading, fetchWeather]);
 
   return (
     <div className="h-screen w-full overflow-hidden bg-background text-foreground transition-colors duration-500 relative flex flex-col">

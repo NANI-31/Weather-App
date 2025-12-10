@@ -23,7 +23,7 @@ export const Navbar = () => {
       {/* We'll handle layout spacing in Layout.tsx or allow overlap styles if preferred. 
           For a true glass effect, we want overlap, so we won't put a block spacer here. */}
 
-      <div className="absolute top-0 left-0 right-0 z-50 p-4 flex justify-center pointer-events-none">
+      <div className="fixed top-0 left-0 right-0 z-50 p-4 flex justify-center pointer-events-none">
         <nav className="pointer-events-auto w-full max-w-7xl bg-card/60 backdrop-blur-xl border border-white/10 shadow-lg rounded-2xl px-4 py-3 flex items-center justify-between transition-all duration-300">
           <Link to="/" className="flex items-center gap-2 group">
             <div className="p-2 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors">
