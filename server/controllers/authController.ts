@@ -204,9 +204,20 @@ const logoutUser = (req: Request, res: Response) => {
 // @route   POST /api/auth/forgot-password
 // @access  Public
 const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  console.log("forgotPassword Controller Hit. Body:", req.body);
   try {
     const { email } = req.body;
+    if (!email) {
+      console.log("Error: Email missing in body");
+      res.status(400).json({ message: "Email is required" });
+      return;
+    }
+
     const user = await User.findOne({ email });
+    console.log(
+      "User search result:",
+      user ? `Found user: ${user.email}` : "User not found"
+    );
 
     if (!user) {
       res.status(404).json({ message: "User not found" });

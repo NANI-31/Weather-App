@@ -128,19 +128,29 @@ export default function AuthForms() {
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!forgotEmail) return toast.error("Please enter your email");
+    console.log("handleForgotPassword called with email:", forgotEmail);
+
+    if (!forgotEmail) {
+      console.log("Error: Email is empty");
+      return toast.error("Please enter your email");
+    }
 
     if (!emailRegex.test(forgotEmail)) {
+      console.log("Error: Invalid email format");
       return toast.error("Please enter a valid email address");
     }
 
     try {
-      await forgotPassword(forgotEmail);
+      console.log("Calling forgotPassword API...");
+      const response = await forgotPassword(forgotEmail);
+      console.log("API Response:", response);
+
       toast.success("OTP sent to your email!");
       setAuthView("verify-otp");
     } catch (error) {
       console.error("Forgot Password Error:", error);
       if (axios.isAxiosError(error) && error.response) {
+        console.log("Axios Error Data:", error.response.data);
         toast.error(error.response.data?.message || "Failed to send OTP");
       } else {
         toast.error("Failed to send OTP");
