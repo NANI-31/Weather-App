@@ -235,22 +235,13 @@ const forgotPassword = async (req: Request, res: Response): Promise<void> => {
     // Send Email
     // Use explicit host and port for better reliability on cloud platforms
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
+      service: "gmail",
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
       logger: true,
       debug: true,
-      // Increase timeouts to handle slow cloud network
-      connectionTimeout: 60000,
-      greetingTimeout: 30000,
-      socketTimeout: 60000,
-      tls: {
-        rejectUnauthorized: false,
-      },
     });
 
     const mailOptions = {
