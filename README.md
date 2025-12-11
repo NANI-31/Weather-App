@@ -70,7 +70,7 @@ graph TD
     Client -- "Fetch Weather" --> ExtAPI
 ```
 
-## 🏗️ System Architecture
+(another diagram)
 
 ```mermaid
 graph TD
