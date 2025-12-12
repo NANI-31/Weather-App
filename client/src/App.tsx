@@ -3,6 +3,7 @@ import { store } from "@app/store";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { pingServer } from "./api/authAPI;
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
@@ -22,6 +23,10 @@ const App = () => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  
+  useEffect(() => {
+    pingServer();
   }, []);
 
   return (
