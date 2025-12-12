@@ -3,7 +3,7 @@ import { store } from "@app/store";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { pingServer } from "./api/authAPI;
+import { pingServer } from "./api/authAPI";
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
